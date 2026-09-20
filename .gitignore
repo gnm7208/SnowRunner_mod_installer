@@ -1,0 +1,5 @@
+# local config with the mod.io token — never commit
+.env
+# debug dump from -d
+temp.json
+__pycache__/

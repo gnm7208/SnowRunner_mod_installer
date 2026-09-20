@@ -32,3 +32,31 @@ The installer will not remove the mods from the cache folder, so if you need to 
 If you need to remove all mods from the cache, run the installer with `--clear-cache` or `-c` argument.
 
 If you need to download new versions of mods, run the installer with `--update` or `-u` argument (without this argument, only a message about new versions of mods will appear).
+### Linux / macOS / Lutris (Python version)
+
+`modio_sr.py` is a port of the PowerShell script that runs anywhere Python 3.8+ is
+installed (no extra packages). It does the same job with the same arguments, plus a
+few conveniences:
+
+- Reads its config from a `.env` file (gitignored) instead of `env.ps1`.
+- Patches your existing `user_profile.cfg` in place (`areModsPermitted`,
+  `modDependencies`, `modFilter`, `modTags`) instead of requiring you to replace it,
+  so GDPR/ESRB acceptance flags are kept.
+- Follows API pagination, so more than 100 subscriptions work.
+- Rewrites thumbnail paths to `C:/...` when the mods folder lives inside a Wine prefix.
+
+Setup:
+
+1. `cp .env.example .env` and fill in `ACCESS_TOKEN`, `USER_PROFILE`, `MODS_DIR`.
+   For a non-Steam build under Lutris the profile is usually at
+   `<prefix>/drive_c/users/Public/Documents/Steam/<EMU>/1465360/remote/user_profile.cfg`
+   and the mods dir at
+   `<prefix>/drive_c/users/<USER>/Documents/My Games/SnowRunner/base/Mods/.modio/mods`.
+2. With the game closed, run `python3 modio_sr.py --init-profile` once to enable mods
+   in the profile (no token needed for this step).
+3. Subscribe to mods on mod.io, then run `python3 modio_sr.py`.
+4. Start the game, wait on the main menu (or Load Game and back), open MOD BROWSER
+   and enable the mods.
+
+Arguments are the same as the PowerShell version: `-u/--update`, `-c/--clear-cache`,
+`-d/--debug`, `-v/--version`, plus `--init-profile` described above.
