@@ -36,6 +36,8 @@ from typing import Dict, List, Optional
 VERSION = "0.2-py"
 GAME_ID = 306
 API_BASE = "https://api.mod.io/v1"
+# mod.io's Cloudflare front rejects the default "Python-urllib" agent
+USER_AGENT = f"SnowRunnerModInstaller/{'0.2-py'} (+https://github.com/gnm7208/SnowRunner_mod_installer)"
 SCRIPT_DIR = Path(__file__).resolve().parent
 
 DEBUG = False
@@ -179,6 +181,7 @@ def api_headers(token: str) -> Dict[str, str]:
         "Authorization": f"Bearer {token}",
         "Accept": "application/json",
         "X-Modio-Platform": "Windows",
+        "User-Agent": USER_AGENT,
     }
 
 
@@ -220,7 +223,9 @@ def fetch_subscribed(token: str) -> List[dict]:
 
 
 def download(url: str, dest: Path, headers: Optional[Dict[str, str]] = None) -> None:
-    req = urllib.request.Request(url, headers=headers or {})
+    hdrs = {"User-Agent": USER_AGENT}
+    hdrs.update(headers or {})
+    req = urllib.request.Request(url, headers=hdrs)
     tmp = dest.with_suffix(dest.suffix + ".part")
     try:
         with urllib.request.urlopen(req, timeout=120) as resp, tmp.open("wb") as fh:
